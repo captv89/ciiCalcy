@@ -20,14 +20,6 @@ type Consumption struct {
 	Quantity string `json:"quantity"`
 }
 
-type CIIReference struct {
-	ShipTypeCode string `json:"ship_type_code"`
-	Case         string `json:"case"`
-	Capacity     string `json:"capacity"`
-	AValue       string `json:"a_value"`
-	CValue       string `json:"c_value"`
-}
-
 // Output Struct for sending data
 type Output struct {
 	ImoNumber        string `json:"imo_number"`

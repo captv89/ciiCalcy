@@ -2,51 +2,80 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
+	"os"
 )
 
 // Main function
 func main() {
+	// Start a gin server
+	go startGinServer()
 
-	//	Sample input
-	input := Input{
-		ImoNumber:    "1234567",
-		ShipName:     "Box Ship",
-		ShipType:     "Container ship",
-		Flag:         "Singapore",
-		YearBuilt:    "2010",
-		HomePort:     "Singapore",
-		DeadWeight:   "300000",
-		GrossTonnage: "280000",
-		FuelConsumption: []Consumption{
-			{
-				Distance: "19000",
-				Fuel:     "HFO",
-				Quantity: "2800",
-			},
-			{
-				Distance: "1000",
-				Fuel:     "Diesel/Gas Oil",
-				Quantity: "500",
-			},
-		},
-		RatingYear: "2023",
+	// Listen to the input to exit the program if exit is typed
+	var input string
+	_, err := fmt.Scanln(&input)
+	if err != nil {
+		log.Println(err)
+		return
 	}
+
+	if input == "exit" {
+		log.Println("Exiting the program")
+		os.Exit(0)
+	}
+}
+
+// Start a gin server to listen on 8080
+func startGinServer() {
+	router := gin.Default()
+
+	// Handle the POST request
+	router.POST("/calculate-cii", calcy)
+
+	// Start the server
+	err := router.Run(":8080")
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// Handle the POST request
+func calcy(c *gin.Context) {
+
+	// Process the input
+	var input Input
+	err := c.ShouldBindJSON(&input)
+	// Check for any errors during input processing
+	if err != nil {
+		log.Println("Error: ", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	//// Print the input
+	//log.Println("Input: ", input)
 
 	// Check if the input is valid
 	skipAction := validateInput(input)
 
 	if !skipAction {
-		Action(input)
+		output := Action(input)
+		c.JSON(http.StatusOK, output)
 	} else {
-		log.Println("Invalid input")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid input",
+		})
 	}
 }
 
 // validateInput is the function to validate the input
 func validateInput(input Input) bool {
 	shipType := input.ShipType
-
+	//log.Println("Ship type: ", shipType)
 	// Check if the ship type is valid
 	_, ok := vesselType[shipType]
 	if !ok {
@@ -75,7 +104,7 @@ func validateInput(input Input) bool {
 }
 
 // Action is the function to read the input from the user
-func Action(input Input) {
+func Action(input Input) Output {
 
 	// Call the TotalConsumption function to calculate the total distance and total CO2 emission
 	totalDistance, totalCO2Emission := TotalConsumption(input.FuelConsumption)
@@ -103,5 +132,5 @@ func Action(input Input) {
 	// Print the output
 	fmt.Println(output)
 
-	return
+	return output
 }

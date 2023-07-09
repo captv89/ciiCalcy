@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 // Main function
 func main() {
@@ -8,8 +11,8 @@ func main() {
 	//	Sample input
 	input := Input{
 		ImoNumber:    "1234567",
-		ShipName:     "Sample Ship",
-		ShipType:     "Bulk carrier",
+		ShipName:     "Box Ship",
+		ShipType:     "Container ship",
 		Flag:         "Singapore",
 		YearBuilt:    "2010",
 		HomePort:     "Singapore",
@@ -30,7 +33,45 @@ func main() {
 		RatingYear: "2023",
 	}
 
-	Action(input)
+	// Check if the input is valid
+	skipAction := validateInput(input)
+
+	if !skipAction {
+		Action(input)
+	} else {
+		log.Println("Invalid input")
+	}
+}
+
+// validateInput is the function to validate the input
+func validateInput(input Input) bool {
+	shipType := input.ShipType
+
+	// Check if the ship type is valid
+	_, ok := vesselType[shipType]
+	if !ok {
+		log.Println("Invalid ship type")
+		return true
+	}
+
+	// Check if the fuel consumption is valid
+	for _, fuelConsumption := range input.FuelConsumption {
+		fuel := fuelConsumption.Fuel
+		_, ok := fuelType[fuel]
+		if !ok {
+			log.Println("Invalid fuel type")
+			return true
+		}
+	}
+
+	// Check if the rating year is valid
+	_, ok = reductionFactor[input.RatingYear]
+	if !ok {
+		log.Println("Invalid rating year")
+		return true
+	}
+
+	return false
 }
 
 // Action is the function to read the input from the user

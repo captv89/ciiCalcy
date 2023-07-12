@@ -17,7 +17,7 @@ func TestMain(m *testing.M) {
 		HomePort:     "Singapore",
 		DeadWeight:   "300000",
 		GrossTonnage: "280000",
-		FuelConsumption: []Consumption{
+		FuelConsumptions: []Consumption{
 			{
 				Distance: "19000",
 				Fuel:     "HFO",

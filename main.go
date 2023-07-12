@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -31,13 +32,26 @@ func main() {
 func startGinServer() {
 	router := gin.Default()
 
+	// Enable CORS
+	router.Use(cors.Default())
+
 	// Handle the POST request
 	router.POST("/calculate-cii", calcy)
 
 	// Start the server
-	err := router.Run(":8080")
-	if err != nil {
-		log.Fatal(err)
+	//Start and run the server if production environment
+	if os.Getenv("APP_ENV") == "prod" {
+		log.Println("Starting server in production environment")
+		err := router.RunTLS(fmt.Sprintf(":%s", os.Getenv("PORT")), os.Getenv("CERT_PATH"), os.Getenv("KEY_PATH"))
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		log.Println("Starting server in development environment")
+		err := router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -57,7 +71,7 @@ func calcy(c *gin.Context) {
 	}
 
 	//// Print the input
-	//log.Println("Input: ", input)
+	log.Println("Input: ", input)
 
 	// Check if the input is valid
 	skipAction := validateInput(input)
@@ -84,7 +98,7 @@ func validateInput(input Input) bool {
 	}
 
 	// Check if the fuel consumption is valid
-	for _, fuelConsumption := range input.FuelConsumption {
+	for _, fuelConsumption := range input.FuelConsumptions {
 		fuel := fuelConsumption.Fuel
 		_, ok := fuelType[fuel]
 		if !ok {
@@ -107,7 +121,7 @@ func validateInput(input Input) bool {
 func Action(input Input) Output {
 
 	// Call the TotalConsumption function to calculate the total distance and total CO2 emission
-	totalDistance, totalCO2Emission := TotalConsumption(input.FuelConsumption)
+	totalDistance, totalCO2Emission := TotalConsumption(input.FuelConsumptions)
 
 	// Call the CIICalculator function to calculate the CII
 	attainedCII, ciiReference, requiredCII, ciiScore, ciiRating := CIICalculator(input.ShipType, input.DeadWeight, input.GrossTonnage, totalDistance, totalCO2Emission, input.RatingYear)

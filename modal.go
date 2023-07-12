@@ -2,16 +2,16 @@ package main
 
 // Input Struct for receiving data
 type Input struct {
-	ImoNumber       string        `json:"imo_number"`
-	ShipName        string        `json:"ship_name"`
-	ShipType        string        `json:"ship_type"`
-	Flag            string        `json:"flag"`
-	YearBuilt       string        `json:"year_built"`
-	HomePort        string        `json:"home_port"`
-	DeadWeight      string        `json:"dead_weight"`
-	GrossTonnage    string        `json:"gross_tonnage"`
-	FuelConsumption []Consumption `json:"fuel_consumption"`
-	RatingYear      string        `json:"rating_year"`
+	ImoNumber        string        `json:"imo_number"`
+	ShipName         string        `json:"ship_name"`
+	ShipType         string        `json:"ship_type"`
+	Flag             string        `json:"flag"`
+	YearBuilt        string        `json:"year_built"`
+	HomePort         string        `json:"home_port"`
+	DeadWeight       string        `json:"dead_weight"`
+	GrossTonnage     string        `json:"gross_tonnage"`
+	FuelConsumptions []Consumption `json:"fuel_consumptions"`
+	RatingYear       string        `json:"rating_year"`
 }
 
 type Consumption struct {

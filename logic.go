@@ -59,7 +59,7 @@ func CIICalculator(shipType, deadWeight, grossTonnage, totalDistance, totalCO2Em
 	} else if ciiScoreFloat > d4 {
 		ciiRating = "E"
 	} else {
-		log.Fatal("Error in calculating CII rating")
+		ciiRating = "Error in calculating CII rating. Please check your input parameters."
 	}
 
 	return
